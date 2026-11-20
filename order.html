@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout Summary | CocoBrew</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="coffee.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body>
+    <div id="checkoutApp" v-cloak>
+        <header class="header">
+            <div class="logo">
+                <h1>COCOBREW</h1>
+                <p>Checkout Summary</p>
+            </div>
+            <nav>
+                <a href="index.html">Home</a>
+                <a href="coffee.html">Coffee</a>
+                <a href="cocoa.html">Cocoa</a>
+                <a href="chocolate.html">Chocolate</a>
+                <a href="gift pack.html">Gift Packs</a>
+                <a href="index.html#contact">Contact</a>
+            </nav>
+            <div class="header-actions">
+                <button class="login-btn" @click="loginOpen = true" v-if="!isLoggedIn">Sign In</button>
+                <button class="signup-btn" @click="signupOpen = true" v-if="!isLoggedIn">Sign Up</button>
+                <div class="user-panel" v-else>
+                    <span>Hi, {{ userName }}</span>
+                    <button class="logout-btn" @click="logout">Logout</button>
+                </div>
+                <button class="cart-button" @click="cartOpen = true">
+                    🛒 Cart <span class="cart-count">{{ cartCount }}</span>
+                </button>
+            </div>
+        </header>
+
+        <section class="coffee-section">
+            <h2>Order Summary</h2>
+            <p class="section-description">Review your items before confirming your purchase.</p>
+
+            <div class="order-confirmation" v-if="orderConfirmed && order.items.length > 0 && !editingOrder">
+                <div class="invoice-header">
+                    <div class="seller">
+                        <img src="logo.png" alt="CocoBrew" class="seller-logo" onerror="this.style.display='none'">
+                        <div class="seller-details">
+                            <div class="seller-name">CocoBrew</div>
+                            <div class="seller-line">Organic Coffee • Organic Cocoa • Premium Chocolates</div>
+                            <div class="seller-line">Phone: +91-99999-00000 | Email: support@cocobrew.example</div>
+                            <div class="seller-line">Address: Araku Valley, India</div>
+                            <div class="seller-line">GSTIN: 00AAAAA0000A0Z0</div>
+                        </div>
+                    </div>
+                    <div class="invoice-actions">
+                        <button class="download-btn" @click="printBill">Download PDF</button>
+                    </div>
+                </div>
+
+                <div class="track-order-header">
+                    <div>
+                        <span class="success-badge">✓ Order placed</span>
+                        <h3>Track Order</h3>
+                    </div>
+                    <div class="tracking-meta">
+                        <div class="tracking-chips">
+                            <span class="tracking-chip">🚚 In transit</span>
+                            <span class="tracking-chip">ETA 6 PM - 9 PM</span>
+                        </div>
+                        <span>Order ID: {{ order.orderId }}</span>
+                        <span>{{ order.details.orderStatus || 'Processing' }}</span>
+                    </div>
+                </div>
+
+                <div class="order-success-banner">
+                    <div>
+                        <h3>🎉 Your order is confirmed!</h3>
+                    </div>
+                    <p>Estimated delivery: {{ order.details.expectedDeliveryDate || 'Today, 6 PM - 9 PM' }}</p>
+                </div>
+
+                <div class="delivery-progress-block premium-delivery-bar">
+                    <div class="progress-header">
+                        <span>Delivery progress</span>
+                        <strong>On the way</strong>
+                    </div>
+                    <div class="delivery-track">
+                        <span class="delivery-step done"><span class="icon">✓</span> Ordered</span>
+                        <span class="delivery-step done"><span class="icon">📦</span> Packed</span>
+                        <span class="delivery-step active"><span class="icon">🚚</span> Shipped</span>
+                        <span class="delivery-step"><span class="icon">✅</span> Delivered</span>
+                    </div>
+                    <div class="progress-bar-wrap">
+                        <div class="progress-bar" style="width: 72%"></div>
+                    </div>
+                </div>
+
+                <div class="checkout-two-column">
+                    <div class="items-panel summary-card">
+                        <div class="summary-head">Items in your order</div>
+                        <div class="ordered-item" v-for="(it, idx) in order.items" :key="it.cartId">
+                            <div class="thumb-block">
+                                <img :src="it.image" alt="" />
+                                <span class="qty-badge">{{ it.qty }}</span>
+                            </div>
+                            <div class="ordered-item-meta">
+                                <div class="ordered-name-wrap">
+                                    <div class="ordered-name">{{ it.name }}</div>
+                                </div>
+                                <div class="ordered-meta">Price: ₹{{ it.price }}</div>
+                                <div class="ordered-meta" v-if="it.description">{{ it.description }}</div>
+                            </div>
+                            <div class="ordered-price">₹{{ (it.price || 0) * (it.qty || 1) }}</div>
+                        </div>
+                    </div>
+
+                    <div class="summary-card pricing-card">
+                        <div class="summary-head">Price Details</div>
+                        <div class="price-row">
+                            <span>Item subtotal</span>
+                            <strong>₹{{ itemSubtotal }}</strong>
+                        </div>
+                        <div class="price-row">
+                            <span>Delivery charge</span>
+                            <strong>₹{{ deliveryChargeValue }}</strong>
+                        </div>
+                        <div class="price-row">
+                            <span>GST (5%)</span>
+                            <strong>₹{{ gstValue }}</strong>
+                        </div>
+                        <div class="price-row discount-row" v-if="discountValue > 0">
+                            <span>Discount</span>
+                            <strong>-₹{{ discountValue }}</strong>
+                        </div>
+                        <div class="price-row total-row-summary clean-total-row">
+                            <span>Total amount</span>
+                            <strong>₹{{ orderSummaryTotal }}</strong>
+                        </div>
+
+                        <div class="eta-card">
+                            <div class="eta-label">ETA</div>
+                            <div class="eta-time">{{ order.details.expectedDeliveryDate || 'Today, 6 PM - 9 PM' }}</div>
+                        </div>
+
+                        <div class="delivery-address-box">
+                            <div class="summary-head">Delivery Address</div>
+                            <div class="summary-detail strong">{{ order.details.name || 'Customer name pending' }}</div>
+                            <div class="summary-detail">{{ order.details.address || 'Address not added yet' }}</div>
+                            <div class="summary-detail">{{ deliveryLocationText }}</div>
+                            <div class="summary-detail">{{ order.details.phone || 'Phone pending' }}</div>
+                        </div>
+
+                        <div class="payment-box payment-card">
+                            <div class="summary-head">Payment</div>
+                            <div class="payment-detail-row">
+                                <span>Mode</span>
+                                <strong>{{ order.details.paymentMethod || 'Not selected' }}</strong>
+                            </div>
+                            <div class="payment-detail-row">
+                                <span>Status</span>
+                                <strong>{{ order.details.paymentStatus || 'Pending' }}</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cta-row">
+                    <button class="cta-btn primary" @click="backToShop">Buy again</button>
+                    <button class="cta-btn secondary" @click="editOrderDetails">Edit details</button>
+                    <button class="cta-btn secondary" @click="printBill">Track order</button>
+                </div>
+
+                <table class="order-summary">
+                    <thead>
+                        <tr>
+                            <th>S.No</th>
+                            <th>Order Details</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>1</td><td>Order ID</td><td>{{ order.orderId }}</td></tr>
+                        <tr><td>2</td><td>Order Date</td><td>{{ order.date }}</td></tr>
+                        <tr><td>3</td><td>Customer Name</td><td>{{ order.details.name }}</td></tr>
+                        <tr><td>4</td><td>Mobile Number</td><td>{{ order.details.phone }}</td></tr>
+                        <tr>
+                            <td>5</td>
+                            <td>Products</td>
+                            <td>
+                                <table class="product-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Item</th>
+                                            <th>SKU</th>
+                                            <th>Qty</th>
+                                            <th>Price</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="(it, idx) in order.items" :key="it.cartId">
+                                            <td class="product-cell">
+                                                <img :src="it.image" alt="" />
+                                                <div class="product-meta">
+                                                    <div class="name">{{ it.name }}</div>
+                                                    <div class="desc" v-if="it.description">{{ it.description }}</div>
+                                                </div>
+                                            </td>
+                                            <td class="sku">{{ it.id || it.sku || 'N/A' }}</td>
+                                            <td class="qty">{{ it.qty }}</td>
+                                            <td class="price">₹{{ it.price }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr><td>6</td><td>Delivery Charges</td><td>₹{{ order.details.deliveryCharges || 0 }}</td></tr>
+                        <tr class="total-row"><td>7</td><td><strong>Total Amount</strong></td><td><strong>₹{{ order.total }}</strong></td></tr>
+                        <tr>
+                            <td>8</td>
+                            <td><strong>How will you pay?</strong></td>
+                            <td>
+                                <span class="payment-badge">{{ order.details.paymentMethod || 'Not selected' }}</span>
+                            </td>
+                        </tr>
+                        <tr><td>9</td><td>Payment Status</td><td>{{ order.details.paymentStatus || 'Pending' }}</td></tr>
+                        <tr><td>10</td><td>Delivery Address</td><td>{{ order.details.address }}</td></tr>
+                        <tr><td>11</td><td>City</td><td>{{ order.details.city }}</td></tr>
+                        <tr><td>12</td><td>State</td><td>{{ order.details.state }}</td></tr>
+                        <tr><td>13</td><td>PIN Code</td><td>{{ order.details.pin }}</td></tr>
+                        <tr><td>14</td><td>Order Status</td><td>{{ order.details.orderStatus || 'Processing' }}</td></tr>
+                        <tr><td>15</td><td>Tracking ID</td><td>{{ order.details.trackingId || 'N/A' }}</td></tr>
+                        <tr><td>16</td><td>Expected Delivery Date</td><td>{{ order.details.expectedDeliveryDate || 'TBD' }}</td></tr>
+                        <tr><td>17</td><td>Remarks</td><td>{{ order.details.remarks }}</td></tr>
+                    </tbody>
+                </table>
+                <div class="cart-total">
+                    <button class="checkout-btn" @click="backToShop">Continue Shopping</button>
+                    <button class="view-btn" @click="printBill">Print Receipt</button>
+                </div>
+            </div>
+
+            <div v-else>
+                <div class="order-details" v-if="order.items.length > 0">
+                    <div class="checkout-form-header">
+                        <div>
+                            <span class="checkout-tag">Delivery details</span>
+                            <h3>Complete your checkout</h3>
+                        </div>
+                        <span class="required-note">Required fields marked *</span>
+                    </div>
+
+                    <div class="checkout-grid">
+                        <div class="form-group full-width">
+                            <label>Full Name <span>*</span></label>
+                            <input v-model="order.details.name" type="text" placeholder="Enter your full name" class="detail-field" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Phone Number <span>*</span></label>
+                            <input v-model="order.details.phone" type="tel" placeholder="Enter mobile number" class="detail-field" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input v-model="loginForm.email" type="email" placeholder="Enter email address" class="detail-field">
+                        </div>
+
+                        <div class="form-group">
+                            <label>City <span>*</span></label>
+                            <input v-model="order.details.city" type="text" placeholder="Enter city" class="detail-field" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>State <span>*</span></label>
+                            <input v-model="order.details.state" type="text" placeholder="Enter state" class="detail-field" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>PIN Code <span>*</span></label>
+                            <input v-model="order.details.pin" type="text" placeholder="Enter PIN code" class="detail-field" required>
+                        </div>
+
+                        <div class="form-group full-width address-block">
+                            <label>Delivery Address <span>*</span></label>
+                            <div class="address-field-wrap">
+                                <textarea v-model="order.details.address" placeholder="House number, street, locality, landmark" class="detail-field address-field" required></textarea>
+                                <button type="button" class="location-btn" @click="detectCurrentLocation" :disabled="locationLoading" :aria-label="locationLoading ? 'Detecting your current location' : 'Use your current location'" :title="locationLoading ? 'Detecting your current location' : 'Use your current location'">
+                                    {{ locationLoading ? 'Detecting...' : 'Use current location' }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="form-group full-width address-block">
+                            <label>Delivery Instructions</label>
+                            <textarea v-model="order.details.instructions" placeholder="Any special delivery note or instruction" class="detail-field address-field"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="checkout-utility-row">
+                        <a class="gift-option gift-option-button" href="gift pack.html">
+                            <span class="gift-option-icon" aria-hidden="true">🎁</span>
+                            <span>
+                                <strong>Add gift packaging</strong>
+                                <small>Choose your gift pack</small>
+                            </span>
+                        </a>
+
+                        <label class="delivery-fee">
+                            Delivery Charges: ₹ <input type="number" v-model.number="order.details.deliveryCharges" @change="recalculateOrder(); saveOrder()" min="0">
+                        </label>
+
+                        <label class="discount-field">
+                            Discount: <input type="text" v-model="order.details.discount" @change="recalculateOrder(); saveOrder()" placeholder="0 or 10%">
+                        </label>
+                    </div>
+
+                    <div class="checkout-payment-grid">
+                        <div class="form-group">
+                            <label>How will you pay? <span>*</span></label>
+                            <select v-model="order.details.paymentMethod" class="detail-field" required>
+                                <option value="">Select</option>
+                                <option>Cash on Delivery (COD)</option>
+                                <option>UPI</option>
+                                <option>Credit Card</option>
+                                <option>Debit Card</option>
+                                <option>Net Banking</option>
+                                <option>Amazon Pay</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Payment Status <span>*</span></label>
+                            <select v-model="order.details.paymentStatus" class="detail-field" required>
+                                <option value="">Select</option>
+                                <option>Pending</option>
+                                <option>Paid</option>
+                                <option>Failed</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cart-item" v-for="item in order.items" :key="item.cartId">
+                    <img :src="item.image" :alt="item.name">
+                    <div class="cart-item-info">
+                        <h3>{{ item.name }}</h3>
+                        <p>₹{{ item.price }} × {{ item.qty }}</p>
+                        <div class="quantity-controls">
+                            <button class="qty-btn" @click="updateOrderQty(item, -1)">-</button>
+                            <span class="qty-value">{{ item.qty }}</span>
+                            <button class="qty-btn" @click="updateOrderQty(item, 1)">+</button>
+                        </div>
+                        <p>Subtotal: ₹{{ item.price * item.qty }}</p>
+                        <button class="remove-btn" @click="removeOrderItem(item)">Remove</button>
+                    </div>
+                </div>
+
+                <div class="cart-total order-checkout-panel" v-if="order.items.length > 0">
+                    <div class="order-total-box">
+                        <div class="order-total-header">Payment Summary</div>
+                        <div class="price-row">
+                            <span>Items total</span>
+                            <strong>₹{{ itemSubtotal }}</strong>
+                        </div>
+                        <div class="price-row">
+                            <span>Delivery</span>
+                            <strong>₹{{ deliveryChargeValue }}</strong>
+                        </div>
+                        <div class="price-row">
+                            <span>GST</span>
+                            <strong>₹{{ gstValue }}</strong>
+                        </div>
+                        <div class="price-row discount-row" v-if="discountValue > 0">
+                            <span>Discount</span>
+                            <strong>-₹{{ discountValue }}</strong>
+                        </div>
+                        <div class="price-row total-row-summary">
+                            <span>Order total</span>
+                            <strong>₹{{ orderSummaryTotal }}</strong>
+                        </div>
+                    </div>
+
+                    <div class="checkout-actions">
+                        <button class="checkout-btn" @click="confirmOrder">Place Order</button>
+                        <button class="view-btn" @click="printBill">Print Bill</button>
+                        <button class="view-btn" @click="backToShop">Back to Shop</button>
+                    </div>
+
+                    <p>Gift Packaging: <strong>{{ order.details.giftPacking ? 'Yes' : 'No' }}</strong></p>
+                    <p>Customer: {{ order.customer }}</p>
+                    <p>Order Date: {{ order.date }}</p>
+                </div>
+
+                <div class="empty-cart" v-else>
+                    <p>No order found. Please add items to your cart first.</p>
+                    <a href="coffee.html" class="buy-btn">Return to Shop</a>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <h3>CocoBrew</h3>
+            <p>Organic Coffee • Organic Cocoa • Premium Chocolates</p>
+            <p>© 2026 CocoBrew. All Rights Reserved.</p>
+        </footer>
+
+        <div class="modal" v-if="loginOpen" @click.self="loginOpen = false">
+            <div class="modal-content">
+                <span class="close" @click="loginOpen = false">&times;</span>
+                <h2>Sign In</h2>
+                <input v-model="loginForm.email" type="email" placeholder="Email">
+                <input v-model="loginForm.password" type="password" placeholder="Password">
+                <button class="modal-cart-btn" @click="loginUser">Sign In</button>
+                <p class="modal-switch">Don't have an account? <button type="button" class="link-btn" @click="signupOpen = true; loginOpen = false">Sign Up</button></p>
+            </div>
+        </div>
+        <div class="modal" v-if="signupOpen" @click.self="signupOpen = false">
+            <div class="modal-content">
+                <span class="close" @click="signupOpen = false">&times;</span>
+                <h2>Sign Up</h2>
+                <input v-model="signupForm.name" type="text" placeholder="Full Name">
+                <input v-model="signupForm.email" type="email" placeholder="Email">
+                <input v-model="signupForm.password" type="password" placeholder="Password">
+                <button class="modal-cart-btn" @click="signupUser">Create Account</button>
+                <p class="modal-switch">Already have an account? <button type="button" class="link-btn" @click="loginOpen = true; signupOpen = false">Sign In</button></p>
+            </div>
+        </div>
+        <div class="cart-overlay" v-if="cartOpen" @click.self="cartOpen = false">
+            <div class="cart-popup">
+                <button class="close-cart" @click="cartOpen = false">&times;</button>
+                <h2>🛒 Your Shopping Cart</h2>
+                <div v-if="cart.length === 0" class="empty-cart">
+                    <p>Your cart is empty.</p>
+                    <button @click="cartOpen = false">Continue Shopping</button>
+                </div>
+                <div class="cart-item" v-for="item in cart" :key="item.cartId">
+                    <img :src="item.image" :alt="item.name">
+                    <div class="cart-item-info">
+                        <h3>{{ item.name }}</h3>
+                        <p>₹{{ item.price }} × {{ item.qty }}</p>
+                    </div>
+                    <button class="remove-btn" @click="removeFromCart(item)">Remove</button>
+                </div>
+                <div class="cart-total" v-if="cart.length > 0">
+                    <h3>Total: ₹{{ cartTotalWithGift }}</h3>
+                    <button class="checkout-btn" @click="checkout">Checkout</button>
+                    <button class="remove-btn" @click="clearCart">Clear Cart</button>
+                </div>
+            </div>
+        </div>
+        <p v-if="notice" class="vue-notice">{{ notice }}</p>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>

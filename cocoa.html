@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Organic Cocoa | Coca Plus Coffee</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="cocoa.css">
+
+</head>
+
+<body>
+<div id="pageApp" v-cloak>
+
+<header class="header">
+    <div class="logo">
+        <h1>COCOBREW</h1>
+        <p>Organic Cocoa Collection</p>
+    </div>
+
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="coffee.html">Coffee</a>
+        <a href="cocoa.html">Cocoa</a>
+        <a href="chocolate.html">Chocolate</a>
+        <a href="gift pack.html">Gift Packs</a>
+        <a href="index.html#contact">Contact</a>
+    </nav>
+
+    <div class="header-actions">
+        <button class="login-btn" @click="loginOpen = true" v-if="!isLoggedIn">Sign In</button>
+        <button class="signup-btn" @click="signupOpen = true" v-if="!isLoggedIn">Sign Up</button>
+        <div class="user-panel" v-else>
+            <span>Hi, {{ userName }}</span>
+            <button class="logout-btn" @click="logout">Logout</button>
+        </div>
+        <button class="cart-button" @click="cartOpen = true">
+            🛒 Cart <span class="cart-count">{{ cartCount }}</span>
+        </button>
+    </div>
+</header>
+
+<!-- ================= COCOA BEANS ================= -->
+
+<section class="section">
+
+<h2>Organic Cocoa Beans</h2>
+
+<div class="products">
+
+<div class="card" onclick="showOrder('Organic Criollo Cocoa Beans')">
+
+<img src="criollo.jpg">
+
+<h3>Organic Criollo Cocoa Beans</h3>
+
+<p>Premium Flavor • Rare Variety</p>
+
+<div class="price">
+India : ₹950/kg
+<br>
+Export : $22/kg
+</div>
+
+<button class="view-btn" onclick="event.stopPropagation(); directBuy({id:'cocoa-1', name:'Organic Criollo Cocoa Beans', description:'Premium Flavor • Rare Variety', indiaPrice:950, price:950, image:'criollo.jpg'})">Order Now</button>
+<button class="add-cart-btn" @click.stop="addToCart({id:'cocoa-1', name:'Organic Criollo Cocoa Beans', description:'Premium Flavor • Rare Variety', indiaPrice:950, price:950, image:'criollo.jpg'})">🛒 Add to Cart</button>
+</div>
+
+
+<div class="card" onclick="showOrder('Organic Forastero Cocoa Beans')">
+
+<img src="forastero.jpg">
+
+<h3>Organic Forastero Cocoa Beans</h3>
+
+<p>Rich Cocoa Taste</p>
+
+<div class="price">
+India : ₹720/kg
+<br>
+Export : $17/kg
+</div>
+
+<button class="view-btn" onclick="event.stopPropagation(); directBuy({id:'cocoa-2', name:'Organic Forastero Cocoa Beans', description:'Rich Cocoa Taste', indiaPrice:720, price:720, image:'forastero.jpg'})">Order Now</button>
+<button class="add-cart-btn" @click.stop="addToCart({id:'cocoa-2', name:'Organic Forastero Cocoa Beans', description:'Rich Cocoa Taste', indiaPrice:720, price:720, image:'forastero.jpg'})">🛒 Add to Cart</button>
+</div>
+
+
+<div class="card" onclick="showOrder('Organic Trinitario Cocoa Beans')">
+
+<img src="trinitario.jpg">
+
+<h3>Organic Trinitario Cocoa Beans</h3>
+
+<p>Balanced Aroma & Flavor</p>
+
+<div class="price">
+India : ₹870/kg
+<br>
+Export : $20/kg
+</div>
+
+<button class="view-btn" onclick="event.stopPropagation(); directBuy({id:'cocoa-3', name:'Organic Trinitario Cocoa Beans', description:'Balanced Aroma & Flavor', indiaPrice:870, price:870, image:'trinitario.jpg'})">Order Now</button>
+<button class="add-cart-btn" @click.stop="addToCart({id:'cocoa-3', name:'Organic Trinitario Cocoa Beans', description:'Balanced Aroma & Flavor', indiaPrice:870, price:870, image:'trinitario.jpg'})">🛒 Add to Cart</button>
+</div>
+
+
+<div class="card" onclick="showOrder('Organic Nacional Cocoa Beans')">
+
+<img src="Nacional.jpg">
+
+<h3>Organic Nacional Cocoa Beans</h3>
+
+<p>Fine Aroma Export Quality</p>
+
+<div class="price">
+India : ₹1050/kg
+<br>
+Export : $24/kg
+</div>
+
+<button class="view-btn" onclick="event.stopPropagation(); directBuy({id:'cocoa-4', name:'Organic Nacional Cocoa Beans', description:'Fine Aroma Export Quality', indiaPrice:1050, price:1050, image:'Nacional.jpg'})">Order Now</button>
+<button class="add-cart-btn" @click.stop="addToCart({id:'cocoa-4', name:'Organic Nacional Cocoa Beans', description:'Fine Aroma Export Quality', indiaPrice:1050, price:1050, image:'Nacional.jpg'})">🛒 Add to Cart</button>
+</div>
+
+</div>
+
+</section>
+
+<!-- ================= COCOA POWDER ================= -->
+
+<section class="section">
+
+<h2>Organic Cocoa Powder</h2>
+
+<div class="products">
+
+<div class="card" onclick="showOrder('Natural Cocoa Powder')">
+
+<img src="Natural.jpg">
+
+<h3>Natural Cocoa Powder</h3>
+
+<p>100% Pure Organic Cocoa</p>
+
+<div class="price">
+India : ₹680/kg
+<br>
+Export : $15/kg
+</div>
+
+<button class="view-btn" onclick="event.stopPropagation(); directBuy({id:'cocoa-5', name:'Natural Cocoa Powder', description:'100% Pure Organic Cocoa', indiaPrice:680, price:680, image:'Natural.jpg'})">Order Now</button>
+<button class="add-cart-btn" @click.stop="addToCart({id:'cocoa-5', name:'Natural Cocoa Powder', description:'100% Pure Organic Cocoa', indiaPrice:680, price:680, image:'Natural.jpg'})">🛒 Add to Cart</button>
+</div>
+
+
+<div class="card" onclick="showOrder('Dutch Process Cocoa Powder')">
+
+<img src="Dutch.jpg">
+
+<h3>Dutch Process Cocoa Powder</h3>
+
+<p>Rich Dark Color</p>
+
+<div class="price">
+India : ₹790/kg
+<br>
+Export : $18/kg
+</div>
+
+<button class="view-btn" onclick="event.stopPropagation(); directBuy({id:'cocoa-6', name:'Dutch Process Cocoa Powder', description:'Rich Dark Color', indiaPrice:790, price:790, image:'Dutch.jpg'})">Order Now</button>
+<button class="add-cart-btn" @click.stop="addToCart({id:'cocoa-6', name:'Dutch Process Cocoa Powder', description:'Rich Dark Color', indiaPrice:790, price:790, image:'Dutch.jpg'})">🛒 Add to Cart</button>
+</div>
+
+
+<div class="card" onclick="showOrder('Dark Cocoa Powder')">
+
+<img src="Dark Cocoa Powde.jpg">
+
+<h3>Dark Cocoa Powder</h3>
+
+<p>Strong Chocolate Flavor</p>
+
+<div class="price">
+India : ₹850/kg
+<br>
+Export : $20/kg
+</div>
+
+<button class="view-btn" onclick="event.stopPropagation(); directBuy({id:'cocoa-7', name:'Dark Cocoa Powder', description:'Strong Chocolate Flavor', indiaPrice:850, price:850, image:'Dark Cocoa Powde.jpg'})">Order Now</button>
+<button class="add-cart-btn" @click.stop="addToCart({id:'cocoa-7', name:'Dark Cocoa Powder', description:'Strong Chocolate Flavor', indiaPrice:850, price:850, image:'Dark Cocoa Powde.jpg'})">🛒 Add to Cart</button>
+</div>
+
+
+<div class="card" onclick="showOrder('Baking Cocoa Powder')">
+
+<img src="Baking.jpg">
+
+<h3>Baking Cocoa Powder</h3>
+
+<p>Ideal for Cakes & Desserts</p>
+
+<div class="price">
+India : ₹730/kg
+<br>
+Export : $16/kg
+</div>
+
+<button class="view-btn" onclick="event.stopPropagation(); directBuy({id:'cocoa-8', name:'Baking Cocoa Powder', description:'Ideal for Cakes & Desserts', indiaPrice:730, price:730, image:'Baking.jpg'})">Order Now</button>
+<button class="add-cart-btn" @click.stop="addToCart({id:'cocoa-8', name:'Baking Cocoa Powder', description:'Ideal for Cakes & Desserts', indiaPrice:730, price:730, image:'Baking.jpg'})">🛒 Add to Cart</button>
+</div>
+
+</div>
+
+</section>
+
+<!-- ================= ORDER POPUP ================= -->
+
+<div id="orderPopup">
+
+<div class="popup">
+
+<span onclick="closePopup()">✖</span>
+
+<h2>Place Your Order</h2>
+
+<form>
+
+<input type="text" placeholder="Full Name" required>
+
+<input type="email" placeholder="Email Address" required>
+
+<input type="tel" placeholder="Phone Number" required>
+
+<input type="text" id="product" readonly>
+
+<input type="number" placeholder="Quantity (kg)" required>
+
+<textarea placeholder="Shipping Address"></textarea>
+
+<button type="submit">Place Order</button>
+
+</form>
+
+</div>
+
+</div>
+
+<script>
+
+function directBuy(product) {
+    const item = {
+        id: product.id || (product.name || 'product').toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+        name: product.name,
+        description: product.description || 'Premium CocoBrew product',
+        price: Number(product.price || product.indiaPrice || 0),
+        indiaPrice: Number(product.price || product.indiaPrice || 0),
+        image: product.image || 'coffee-beans.jpg'
+    };
+
+    if (window.__COCOBREW_APP__ && typeof window.__COCOBREW_APP__.buyNow === 'function') {
+        window.__COCOBREW_APP__.buyNow(item);
+        return;
+    }
+
+    const fakeOrder = {
+        items: [item],
+        total: item.price,
+        customer: 'Guest',
+        date: new Date().toLocaleString(),
+        orderId: `COCO-${Date.now()}`,
+        confirmed: true,
+        details: {
+            name: '',
+            phone: '',
+            address: '',
+            city: '',
+            state: '',
+            pin: '',
+            instructions: '',
+            giftPacking: false,
+            deliveryCharges: 0,
+            paymentMethod: 'Cash on Delivery (COD)',
+            paymentStatus: 'Paid',
+            orderStatus: 'Processing',
+            trackingId: `TRK-${Date.now()}`,
+            expectedDeliveryDate: 'Today, 6 PM - 9 PM',
+            remarks: 'Direct buy order.'
+        }
+    };
+    localStorage.setItem('CocoBrew_order', JSON.stringify(fakeOrder));
+    window.location.href = 'order.html';
+}
+
+function showOrder(product){
+    if (typeof product === 'string') {
+        const productMap = {
+            'Organic Criollo Cocoa Beans': {id:'cocoa-1', name:'Organic Criollo Cocoa Beans', description:'Premium Flavor • Rare Variety', price:950, image:'criollo.jpg'},
+            'Organic Forastero Cocoa Beans': {id:'cocoa-2', name:'Organic Forastero Cocoa Beans', description:'Rich Cocoa Taste', price:720, image:'forastero.jpg'},
+            'Organic Trinitario Cocoa Beans': {id:'cocoa-3', name:'Organic Trinitario Cocoa Beans', description:'Balanced Aroma & Flavor', price:870, image:'trinitario.jpg'},
+            'Organic Nacional Cocoa Beans': {id:'cocoa-4', name:'Organic Nacional Cocoa Beans', description:'Fine Aroma Export Quality', price:1050, image:'Nacional.jpg'},
+            'Natural Cocoa Powder': {id:'cocoa-5', name:'Natural Cocoa Powder', description:'100% Pure Organic Cocoa', price:680, image:'Natural.jpg'},
+            'Dutch Process Cocoa Powder': {id:'cocoa-6', name:'Dutch Process Cocoa Powder', description:'Rich Dark Color', price:790, image:'Dutch.jpg'},
+            'Dark Cocoa Powder': {id:'cocoa-7', name:'Dark Cocoa Powder', description:'Strong Chocolate Flavor', price:850, image:'Dark Cocoa Powde.jpg'},
+            'Baking Cocoa Powder': {id:'cocoa-8', name:'Baking Cocoa Powder', description:'Ideal for Cakes & Desserts', price:730, image:'Baking.jpg'}
+        };
+        directBuy(productMap[product]);
+        return;
+    }
+    directBuy(product);
+}
+
+function closePopup(){
+
+document.getElementById("orderPopup").style.display="none";
+
+}
+
+</script>
+
+<div class="modal" v-if="loginOpen" @click.self="loginOpen = false">
+    <div class="modal-content">
+        <span class="close" @click="loginOpen = false">&times;</span>
+        <h2>Sign In</h2>
+        <input v-model="loginForm.email" type="email" placeholder="Email">
+        <input v-model="loginForm.password" type="password" placeholder="Password">
+        <button class="modal-cart-btn" @click="loginUser">Sign In</button>
+        <p class="modal-switch">Don't have an account? <button type="button" class="link-btn" @click="signupOpen = true; loginOpen = false">Sign Up</button></p>
+    </div>
+</div>
+<div class="modal" v-if="signupOpen" @click.self="signupOpen = false">
+    <div class="modal-content">
+        <span class="close" @click="signupOpen = false">&times;</span>
+        <h2>Sign Up</h2>
+        <input v-model="signupForm.name" type="text" placeholder="Full Name">
+        <input v-model="signupForm.email" type="email" placeholder="Email">
+        <input v-model="signupForm.password" type="password" placeholder="Password">
+        <button class="modal-cart-btn" @click="signupUser">Create Account</button>
+        <p class="modal-switch">Already have an account? <button type="button" class="link-btn" @click="loginOpen = true; signupOpen = false">Sign In</button></p>
+    </div>
+</div>
+<div class="cart-overlay" v-if="cartOpen" @click.self="cartOpen = false">
+    <div class="cart-popup">
+        <button class="close-cart" @click="cartOpen = false">&times;</button>
+        <h2>🛒 Your Shopping Cart</h2>
+        <div v-if="cart.length === 0" class="empty-cart">
+            <p>Your cart is empty.</p>
+            <button @click="cartOpen = false">Continue Shopping</button>
+        </div>
+        <div class="cart-item" v-for="item in cart" :key="item.cartId">
+            <img :src="item.image" :alt="item.name">
+            <div class="cart-item-info">
+                <h3>{{ item.name }}</h3>
+                <p>₹{{ item.price }} × {{ item.qty }}</p>
+            </div>
+            <button class="remove-btn" @click="removeFromCart(item)">Remove</button>
+        </div>
+        <div class="cart-total" v-if="cart.length > 0">
+            <h3>Total: ₹{{ cartTotal }}</h3>
+            <button class="checkout-btn" @click="checkout">Checkout</button>
+            <button class="remove-btn" @click="clearCart">Clear Cart</button>
+        </div>
+    </div>
+</div>
+<p v-if="notice" class="vue-notice">{{ notice }}</p>
+</div>
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script src="main.js"></script>
+
+</body>
+</html>
